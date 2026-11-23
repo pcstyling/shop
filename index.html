@@ -6,642 +6,138 @@
   <title>Vape Shop</title>
   <script src="https://telegram.org"></script>
   <style>
-    :root {
-      --bg-color: #121214;
-      --card-bg: rgba(30, 30, 35, 0.85);
-      --accent: #ff6b2b;
-      --text-main: #ffffff;
-      --text-muted: #9ca3af;
-      --border: rgba(255, 255, 255, 0.08);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      padding-bottom: 85px;
-    }
-
-    .animated-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      overflow: hidden;
-      pointer-events: none;
-      background: radial-gradient(circle at 50% 50%, #1a1a22 0%, #0d0d10 100%);
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.45;
-      animation: float 14s infinite ease-in-out alternate;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: #ff6b2b;
-      top: -40px;
-      left: -60px;
-    }
-
-    .orb-2 {
-      width: 350px;
-      height: 350px;
-      background: #6c2bd9;
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -5s;
-    }
-
-    .orb-3 {
-      width: 240px;
-      height: 240px;
-      background: #0ea5e9;
-      top: 40%;
-      left: 35%;
-      animation-delay: -9s;
-    }
-
-    @keyframes float {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(40px, 50px) scale(1.15); }
-      100% { transform: translate(-25px, 20px) scale(0.95); }
-    }
-
-    .app-wrapper {
-      max-width: 1040px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    header {
-      padding: 14px 16px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(18, 18, 20, 0.85);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .top-bar {
-      max-width: 1040px;
-      margin: 0 auto;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .search-input {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .catalog-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 10px 16px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    .drawer {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 15, 18, 0.96);
-      backdrop-filter: blur(16px);
-      z-index: 50;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .drawer.active {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .drawer-inner {
-      max-width: 540px;
-      width: 100%;
-      margin: 0 auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .drawer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .close-btn {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: #fff;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .category-item {
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .category-item:hover {
-      color: var(--accent);
-    }
-
-    .container {
-      padding: 16px;
-    }
-
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    @media (min-width: 640px) {
-      .grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-      }
-    }
-
-    @media (min-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 18px;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      backdrop-filter: blur(10px);
-    }
-
-    .img-placeholder {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08));
-      border: 1px dashed rgba(255,255,255,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 12px;
-      text-align: center;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-
-    .product-title {
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.3;
-      margin-bottom: 10px;
-    }
-
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .price {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .add-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .qty-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 4px 8px;
-    }
-
-    .qty-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 20px;
-    }
-
-    .qty-val {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .cart-fab {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 13px 18px;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 14px;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 24px rgba(255, 107, 43, 0.45);
-      cursor: pointer;
-      z-index: 40;
-    }
-
-    .cart-fab.visible {
-      display: flex;
-    }
-
-    .cart-badge {
-      background: #fff;
-      color: var(--accent);
-      font-weight: 800;
-      font-size: 12px;
-      padding: 2px 7px;
-      border-radius: 20px;
-    }
-    .cart-items {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      gap: 10px;
-    }
-
-    .cart-item-info {
-      flex: 1;
-    }
-
-    .cart-item-title {
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-
-    .cart-item-price {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .cart-footer {
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .cart-total {
-      display: flex;
-      justify-content: space-between;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    .checkout-btn {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .clear-btn {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      border: none;
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 14px;
-      margin-top: 8px;
-      cursor: pointer;
-    }
+    :root { --bg: #121214; --card: rgba(30, 30, 35, 0.85); --accent: #ff6b2b; --text: #fff; --muted: #9ca3af; --border: rgba(255,255,255,0.08); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; padding-bottom: 85px; }
+    .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 50%, #1a1a22 0%, #0d0d10 100%); overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.45; animation: float 14s infinite ease-in-out alternate; }
+    .o1 { width: 300px; height: 300px; background: #ff6b2b; top: -40px; left: -60px; }
+    .o2 { width: 350px; height: 350px; background: #6c2bd9; bottom: -60px; right: -60px; animation-delay: -5s; }
+    .o3 { width: 240px; height: 240px; background: #0ea5e9; top: 40%; left: 35%; animation-delay: -9s; }
+    @keyframes float { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,50px) scale(1.15); } 100% { transform: translate(-25px,20px) scale(0.95); } }
+    header { padding: 14px 16px; position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(18,18,20,0.85); border-bottom: 1px solid var(--border); }
+    .top-bar, .wrap { max-width: 1040px; margin: 0 auto; }
+    .top-bar { display: flex; gap: 10px; align-items: center; }
+    .search { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
+    .cat-btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; }
+    .wrap { padding: 16px; }
+    .title { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+    @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+    .ph { width: 100%; aspect-ratio: 1/1; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 8px; margin-bottom: 10px; }
+    .p-name { font-size: 14px; font-weight: 500; line-height: 1.3; margin-bottom: 10px; }
+    .foot { display: flex; justify-content: space-between; align-items: center; }
+    .price { font-size: 16px; font-weight: 700; }
+    .add { background: var(--accent); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+    .qty-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; }
+    .q-btn { background: none; border: none; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; width: 20px; }
+    .drawer { display: none; position: fixed; inset: 0; background: rgba(15,15,18,0.96); backdrop-filter: blur(16px); z-index: 50; padding: 20px; overflow-y: auto; }
+    .drawer.open { display: flex; flex-direction: column; }
+    .d-in { max-width: 540px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; }
+    .d-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .close { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+    .c-item { padding: 14px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 15px; cursor: pointer; }
+    .c-item:hover { color: var(--accent); }
+    .fab { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: #fff; border: none; padding: 13px 18px; border-radius: 50px; font-weight: 700; font-size: 14px; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(255,107,43,0.45); cursor: pointer; z-index: 40; }
+    .fab.show { display: flex; }
+    .badge { background: #fff; color: var(--accent); font-weight: 800; font-size: 12px; padding: 2px 7px; border-radius: 20px; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+    .btn-main { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
+    .btn-sec { width: 100%; background: rgba(255,255,255,0.08); color: var(--muted); border: none; border-radius: 12px; padding: 10px; font-size: 14px; margin-top: 8px; cursor: pointer; }
+    /* Экран 18+ */
+    .age-overlay { position: fixed; inset: 0; background: rgba(10,10,12,0.92); backdrop-filter: blur(20px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .age-card { max-width: 380px; width: 100%; background: rgba(30,30,36,0.95); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
+    .age-badge { display: inline-block; background: rgba(255,107,43,0.15); color: var(--accent); font-size: 24px; font-weight: 800; padding: 8px 18px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,107,43,0.3); }
+    .age-text { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
   </style>
 </head>
 <body>
+  <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
-  <div class="animated-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+  <!-- Окно подтверждения 18+ -->
+  <div class="age-overlay" id="ageModal">
+    <div class="age-card">
+      <div class="age-badge">18+</div>
+      <h3 style="margin-bottom: 10px;">Подтвердите возраст</h3>
+      <p class="age-text">Весь контент (текст, фото, цены) публикуется исключительно в ознакомительных целях. Продолжая, вы подтверждаете, что вам исполнилось 18 лет.</p>
+      <button class="btn-main" id="confirmAge" style="margin-top:0;">Мне исполнилось 18 лет</button>
+    </div>
   </div>
 
   <header>
     <div class="top-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Поиск по наличию..." oninput="renderProducts()" />
-      <button class="catalog-btn" onclick="toggleCatalog()">Каталог ☰</button>
+      <input type="text" id="q" class="search" placeholder="Поиск по наличию..." oninput="draw()" />
+      <button class="cat-btn" id="openCat">Каталог ☰</button>
     </div>
   </header>
 
-  <div class="app-wrapper">
-    <main class="container">
-      <div class="section-title" id="currentCategoryTitle">Все товары</div>
-      <div class="grid" id="productsGrid"></div>
-    </main>
+  <div class="wrap">
+    <div class="title" id="catTitle">Все товары</div>
+    <div class="grid" id="grid"></div>
   </div>
 
-  <div class="drawer" id="catalogDrawer">
-    <div class="drawer-inner">
-      <div class="drawer-header">
-        <h3>Каталог</h3>
-        <button class="close-btn" onclick="toggleCatalog()">✕</button>
-      </div>
-      <div id="categoryList"></div>
+  <div class="drawer" id="catDrawer">
+    <div class="d-in">
+      <div class="d-head"><h3>Каталог</h3><button class="close" id="closeCat">✕</button></div>
+      <div id="catList"></div>
     </div>
   </div>
 
   <div class="drawer" id="cartDrawer">
-    <div class="drawer-inner">
-      <div class="drawer-header">
-        <h3>Корзина</h3>
-        <button class="close-btn" onclick="toggleCart()">✕</button>
-      </div>
-      <div class="cart-items" id="cartItemsList"></div>
-      <div class="cart-footer">
-        <div class="cart-total">
-          <span>Итого:</span>
-          <span id="cartTotalSum">0₽</span>
+    <div class="d-in">
+      <div class="d-head"><h3>Корзина</h3><button class="close" id="closeCart">✕</button></div>
+      <div id="cartList" style="flex:1; overflow-y:auto;"></div>
+      <div style="padding-top:16px; border-top:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">
+          <span>Итого:</span><span id="totalSum">0₽</span>
         </div>
-        <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
-        <button class="clear-btn" onclick="clearCart()">Очистить корзину</button>
+        <button class="btn-main" id="sendOrder">Оформить заказ</button>
+        <button class="btn-sec" id="clearCart">Очистить корзину</button>
       </div>
     </div>
   </div>
 
-  <button class="cart-fab" id="cartFab" onclick="toggleCart()">
-    <span>🛒 Корзина</span>
-    <span class="cart-badge" id="cartFabCount">0</span>
-  </button>
+  <button class="fab" id="fab"><span>🛒 Корзина</span><span class="badge" id="fabCount">0</span></button>
 
   <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
+
+    // Проверка подтверждения 18+
+    const ageModal = document.getElementById("ageModal");
+    if (localStorage.getItem("age_verified") === "true") {
+      ageModal.style.display = "none";
     }
+    document.getElementById("confirmAge").onclick = () => {
+      localStorage.setItem("age_verified", "true");
+      ageModal.style.display = "none";
+    };
 
-    const MANAGER_USERNAME = "ваш_юзернейм_менеджера";
-
-    const categories = [
-      "Все товары",
-      "POD системы (с вкусовыми картриджами)",
-      "Жидкости",
-      "Испарители и картриджи",
-      "POD системы"
+    const MANAGER = "ваш_юзернейм_менеджера";
+    const cats = ["Все товары", "POD системы (с вкусовыми картриджами)", "Жидкости", "Испарители и картриджи", "POD системы"];
+    const items = [
+      { id: 1, cat: "Жидкости", name: "Пример: Жидкость 1", price: 450 },
+      { id: 2, cat: "POD системы", name: "Пример: POD система 1", price: 2100 },
+      { id: 3, cat: "Испарители и картриджи", name: "Пример: Картридж 1", price: 350 },
+      { id: 4, cat: "POD системы (с вкусовыми картриджами)", name: "Пример: POD со вкусами 1", price: 1500 }
     ];
 
-    const products = [
-      { id: 1, category: "Жидкости", name: "Пример: Жидкость 1", price: 450 },
-      { id: 2, category: "POD системы", name: "Пример: POD система 1", price: 2100 },
-      { id: 3, category: "Испарители и картриджи", name: "Пример: Картридж 1", price: 350 },
-      { id: 4, category: "POD системы (с вкусовыми картриджами)", name: "Пример: POD со вкусами 1", price: 1500 }
-    ];
-
-    let selectedCategory = "Все товары";
+    let curCat = "Все товары";
     let cart = {};
 
-    function toggleCatalog() {
-      document.getElementById("catalogDrawer").classList.toggle("active");
-    }
+    document.getElementById("openCat").onclick = () => document.getElementById("catDrawer").classList.add("open");
+    document.getElementById("closeCat").onclick = () => document.getElementById("catDrawer").classList.remove("open");
+    document.getElementById("fab").onclick = () => { renderCart(); document.getElementById("cartDrawer").classList.add("open"); };
+    document.getElementById("closeCart").onclick = () => document.getElementById("cartDrawer").classList.remove("open");
 
-    function toggleCart() {
-      document.getElementById("cartDrawer").classList.toggle("active");
-      renderCartModal();
-    }
+    document.getElementById("clearCart").onclick = () => {
+      cart = {}; draw(); updateFab(); document.getElementById("cartDrawer").classList.remove("open");
+    };
 
-    function selectCategory(cat) {
-      selectedCategory = cat;
-      document.getElementById("currentCategoryTitle").innerText = cat;
-      toggleCatalog();
-      renderProducts();
-    }
-
-    function changeQty(id, delta) {
-      const current = cart[id] || 0;
-      const next = current + delta;
-      if (next <= 0) {
-        delete cart[id];
-      } else {
-        cart[id] = next;
-      }
-      renderProducts();
-      updateCartFab();
-      if (document.getElementById("cartDrawer").classList.contains("active")) {
-        renderCartModal();
-      }
-    }
-
-    function clearCart() {
-      cart = {};
-      renderProducts();
-      updateCartFab();
-      toggleCart();
-    }
-
-    function updateCartFab() {
-      const fab = document.getElementById("cartFab");
-      let totalCount = 0;
-
-      for (const [id, qty] of Object.entries(cart)) {
-        const item = products.find(p => p.id === Number(id));
-        if (item) {
-          totalCount += qty;
-        }
-      }
-
-      if (totalCount > 0) {
-        fab.classList.add("visible");
-        document.getElementById("cartFabCount").innerText = totalCount;
-      } else {
-        fab.classList.remove("visible");
-      }
-    }
-
-    function renderCartModal() {
-      const list = document.getElementById("cartItemsList");
-      let totalSum = 0;
-      const entries = Object.entries(cart);
-
-      if (entries.length === 0) {
-        list.innerHTML = `<p style="color: var(--text-muted); text-align: center; margin-top: 40px;">Корзина пока пуста</p>`;
-        document.getElementById("cartTotalSum").innerText = "0₽";
-        return;
-      }
-
-      list.innerHTML = entries.map(([id, qty]) => {
-        const item = products.find(p => p.id === Number(id));
-        const sum = item.price * qty;
-        totalSum += sum;
-        return `
-          <div class="cart-item">
-            <div class="cart-item-info">
-              <div class="cart-item-title">${item.name}</div>
-              <div class="cart-item-price">${item.price}₽ × ${qty} = ${sum}₽</div>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
-              <span class="qty-val">${qty}</span>
-              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      document.getElementById("cartTotalSum").innerText = `${totalSum}₽`;
-    }
-
-    function checkout() {
-      const entries = Object.entries(cart);
-      if (entries.length === 0) return;
-
-      let totalSum = 0;
-      let lines = ["🛒 Новый заказ из магазина:\n"];
-
-      entries.forEach(([id, qty], index) => {
-        const item = products.find(p => p.id === Number(id));
-        const sum = item.price * qty;
-        totalSum += sum;
-        lines.push(`${index + 1}. ${item.name} — ${qty} шт. (${sum}₽)`);
-      });
-
-      lines.push(`\n💰 Итого: ${totalSum}₽`);
-      const messageText = encodeURIComponent(lines.join("\n"));
-      const url = `https://t.me{MANAGER_USERNAME}?text=${messageText}`;
-
-      if (tg && tg.openTelegramLink) {
-        tg.openTelegramLink(url);
-      } else {
-        window.open(url, "_blank");
-      }
-    }
-
-    function renderCategories() {
-      const list = document.getElementById("categoryList");
-      list.innerHTML = categories.map(cat => `
-        <div class="category-item" onclick="selectCategory('${cat}')">
-          <span>${cat}</span>
-          <span>›</span>
-        </div>
-      `).join("");
-    }
-
-    function renderProducts() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const grid = document.getElementById("productsGrid");
-
-      const filtered = products.filter(p => {
-        const matchCat = selectedCategory === "Все товары" || p.category === selectedCategory;
-        const matchQuery = p.name.toLowerCase().includes(query);
-        return matchCat && matchQuery;
-      });
-
-      grid.innerHTML = filtered.map(p => {
-        const qty = cart[p.id] || 0;
-        const actionHtml = qty === 0
-          ? `<button class="add-btn" onclick="changeQty(${p.id}, 1)">+</button>`
-          : `<div class="qty-controls">
-               <button class="qty-btn" onclick="changeQty(${p.id}, -1)">−</button>
-               <span class="qty-val">${qty}</span>
-               <button class="qty-btn" onclick="changeQty(${p.id}, 1)">+</button>
-             </div>`;
-
-        return `
-          <div class="card">
-            <div>
-              <div class="img-placeholder">Фото появится позже</div>
-              <div class="product-title">${p.name}</div>
-            </div>
-            <div class="card-footer">
-              <span class="price">${p.price}₽</span>
-              ${actionHtml}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    renderCategories();
-    renderProducts();
-  </script>
-</body>
-</html>
+    document.getElementById("sendOrder").onclick = () => {
+      const keys = Object.keys(cart);
+      if (!keys.length) return;
+      let sum = 0;
+      let txt = ["🛒 Новый заказ:\n"];
