@@ -46,7 +46,6 @@
     .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
     .btn-main { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
     .btn-sec { width: 100%; background: rgba(255,255,255,0.08); color: var(--muted); border: none; border-radius: 12px; padding: 10px; font-size: 14px; margin-top: 8px; cursor: pointer; }
-    /* Экран 18+ */
     .age-overlay { position: fixed; inset: 0; background: rgba(10,10,12,0.92); backdrop-filter: blur(20px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .age-card { max-width: 380px; width: 100%; background: rgba(30,30,36,0.95); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
     .age-badge { display: inline-block; background: rgba(255,107,43,0.15); color: var(--accent); font-size: 24px; font-weight: 800; padding: 8px 18px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,107,43,0.3); }
@@ -56,13 +55,12 @@
 <body>
   <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
-  <!-- Окно подтверждения 18+ -->
   <div class="age-overlay" id="ageModal">
     <div class="age-card">
       <div class="age-badge">18+</div>
       <h3 style="margin-bottom: 10px;">Подтвердите возраст</h3>
       <p class="age-text">Весь контент (текст, фото, цены) публикуется исключительно в ознакомительных целях. Продолжая, вы подтверждаете, что вам исполнилось 18 лет.</p>
-      <button class="btn-main" id="confirmAge" style="margin-top:0;">Мне исполнилось 18 лет</button>
+      <button class="btn-main" id="confirmAge" onclick="passAge()" style="margin-top:0;">Мне исполнилось 18 лет</button>
     </div>
   </div>
 
@@ -105,15 +103,16 @@
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
-    // Проверка подтверждения 18+
-    const ageModal = document.getElementById("ageModal");
-    if (localStorage.getItem("age_verified") === "true") {
-      ageModal.style.display = "none";
+    function passAge() {
+      document.getElementById("ageModal").style.display = "none";
+      try { localStorage.setItem("age_verified", "true"); } catch (e) {}
     }
-    document.getElementById("confirmAge").onclick = () => {
-      localStorage.setItem("age_verified", "true");
-      ageModal.style.display = "none";
-    };
+
+    try {
+      if (localStorage.getItem("age_verified") === "true") {
+        document.getElementById("ageModal").style.display = "none";
+      }
+    } catch (e) {}
 
     const MANAGER = "ваш_юзернейм_менеджера";
     const cats = ["Все товары", "POD системы (с вкусовыми картриджами)", "Жидкости", "Испарители и картриджи", "POD системы"];
@@ -140,4 +139,3 @@
       const keys = Object.keys(cart);
       if (!keys.length) return;
       let sum = 0;
-      let txt = ["🛒 Новый заказ:\n"];
