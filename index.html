@@ -6,100 +6,60 @@
   <title>Vape Shop</title>
   <script src="https://telegram.org"></script>
   <style>
-    :root { --bg: #121214; --card: rgba(30, 30, 35, 0.85); --accent: #ff6b2b; --text: #fff; --muted: #9ca3af; --border: rgba(255,255,255,0.08); }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; padding-bottom: 85px; }
-    .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 50%, #1a1a22 0%, #0d0d10 100%); overflow: hidden; }
-    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.45; animation: float 14s infinite ease-in-out alternate; }
-    .o1 { width: 300px; height: 300px; background: #ff6b2b; top: -40px; left: -60px; }
-    .o2 { width: 350px; height: 350px; background: #6c2bd9; bottom: -60px; right: -60px; animation-delay: -5s; }
-    .o3 { width: 240px; height: 240px; background: #0ea5e9; top: 40%; left: 35%; animation-delay: -9s; }
-    @keyframes float { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,50px) scale(1.15); } 100% { transform: translate(-25px,20px) scale(0.95); } }
-    header { padding: 14px 16px; position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(18,18,20,0.85); border-bottom: 1px solid var(--border); }
-    .top-bar, .wrap { max-width: 1040px; margin: 0 auto; }
-    .top-bar { display: flex; gap: 10px; align-items: center; }
-    .search { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
-    .cat-btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; }
-    .wrap { padding: 16px; }
-    .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
-    .title { font-size: 20px; font-weight: 700; }
-    .badge-18 { background: rgba(255,107,43,0.15); color: var(--accent); border: 1px solid rgba(255,107,43,0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
-    @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .ph { width: 100%; aspect-ratio: 1/1; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; text-align: center; padding: 8px; margin-bottom: 10px; }
-    .p-name { font-size: 14px; font-weight: 500; line-height: 1.3; margin-bottom: 10px; }
-    .foot { display: flex; justify-content: space-between; align-items: center; }
-    .price { font-size: 16px; font-weight: 700; }
-    .add { background: var(--accent); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; }
-    .qty-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; }
-    .q-btn { background: none; border: none; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; width: 20px; }
-    .drawer { display: none; position: fixed; inset: 0; background: rgba(15,15,18,0.96); backdrop-filter: blur(16px); z-index: 50; padding: 20px; overflow-y: auto; }
-    .drawer.open { display: flex; flex-direction: column; }
-    .d-in { max-width: 540px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; }
-    .d-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .close { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; }
-    .c-item { padding: 14px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 15px; cursor: pointer; }
-    .c-item:hover { color: var(--accent); }
-    .fab { display: none; position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: #fff; border: none; padding: 13px 18px; border-radius: 50px; font-weight: 700; font-size: 14px; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(255,107,43,0.45); cursor: pointer; z-index: 40; }
-    .fab.show { display: flex; }
-    .badge { background: #fff; color: var(--accent); font-weight: 800; font-size: 12px; padding: 2px 7px; border-radius: 20px; }
-    .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
-    .btn-main { display: block; width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; text-align: center; }
-    .btn-sec { width: 100%; background: rgba(255,255,255,0.08); color: var(--muted); border: none; border-radius: 12px; padding: 10px; font-size: 14px; margin-top: 8px; cursor: pointer; }
-    .disclaimer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); text-align: center; line-height: 1.4; }
+    :root { --bg:#121214; --card:rgba(30,30,35,.85); --acc:#ff6b2b; --txt:#fff; --mut:#9ca3af; --brd:rgba(255,255,255,.08); }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+    body { background:var(--bg); color:var(--txt); min-height:100vh; overflow-x:hidden; padding-bottom:85px; }
+    .bg { position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(circle at 50% 50%,#1a1a22 0%,#0d0d10 100%); }
+    .orb { position:absolute; border-radius:50%; filter:blur(80px); opacity:.45; animation:fl 14s infinite ease-in-out alternate; }
+    .o1 { width:300px; height:300px; background:#ff6b2b; top:-40px; left:-60px; }
+    .o2 { width:350px; height:350px; background:#6c2bd9; bottom:-60px; right:-60px; animation-delay:-5s; }
+    .o3 { width:240px; height:240px; background:#0ea5e9; top:40%; left:35%; animation-delay:-9s; }
+    @keyframes fl { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,50px) scale(1.15)} 100%{transform:translate(-25px,20px) scale(.95)} }
+    header { padding:14px 16px; position:sticky; top:0; z-index:20; backdrop-filter:blur(14px); background:rgba(18,18,20,.85); border-bottom:1px solid var(--brd); }
+    .top,.wrap { max-width:1040px; margin:0 auto; }
+    .top { display:flex; gap:10px; align-items:center; }
+    .search { flex:1; background:rgba(255,255,255,.07); border:1px solid var(--brd); border-radius:12px; padding:10px 14px; color:#fff; font-size:14px; outline:none; }
+    .cat-btn { background:var(--acc); color:#fff; border:none; border-radius:12px; padding:10px 16px; font-weight:600; font-size:14px; cursor:pointer; white-space:nowrap; }
+    .wrap { padding:16px; }
+    .h-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .title { font-size:20px; font-weight:700; }
+    .b18 { background:rgba(255,107,43,.15); color:var(--acc); border:1px solid rgba(255,107,43,.3); font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; }
+    .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    @media(min-width:640px){ .grid{grid-template-columns:repeat(3,1fr); gap:16px;} }
+    @media(min-width:900px){ .grid{grid-template-columns:repeat(4,1fr); gap:18px;} }
+    .card { background:var(--card); border:1px solid var(--brd); border-radius:16px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; }
+    .ph { width:100%; aspect-ratio:1/1; border-radius:12px; background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; color:var(--mut); font-size:12px; text-align:center; padding:8px; margin-bottom:10px; }
+    .pname { font-size:14px; font-weight:500; line-height:1.3; margin-bottom:10px; }
+    .foot { display:flex; justify-content:space-between; align-items:center; }
+    .price { font-size:16px; font-weight:700; }
+    .add { background:var(--acc); color:#fff; border:none; width:32px; height:32px; border-radius:8px; font-size:18px; cursor:pointer; }
+    .qbox { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); border-radius:8px; padding:4px 8px; }
+    .qbtn { background:none; border:none; color:#fff; font-size:16px; font-weight:700; cursor:pointer; width:20px; }
+    .drw { display:none; position:fixed; inset:0; background:rgba(15,15,18,.96); backdrop-filter:blur(16px); z-index:50; padding:20px; overflow-y:auto; }
+    .drw.open { display:flex; flex-direction:column; }
+    .din { max-width:540px; width:100%; margin:0 auto; flex:1; display:flex; flex-direction:column; }
+    .dhead { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .cls { background:rgba(255,255,255,.1); border:none; color:#fff; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; }
+    .citem { padding:14px 12px; border-bottom:1px solid var(--brd); display:flex; justify-content:space-between; font-size:15px; cursor:pointer; }
+    .citem:hover { color:var(--acc); }
+    .fab { display:none; position:fixed; bottom:20px; right:20px; background:var(--acc); color:#fff; border:none; padding:13px 18px; border-radius:50px; font-weight:700; font-size:14px; align-items:center; gap:8px; box-shadow:0 8px 24px rgba(255,107,43,.45); cursor:pointer; z-index:40; }
+    .fab.show { display:flex; }
+    .bdg { background:#fff; color:var(--acc); font-weight:800; font-size:12px; padding:2px 7px; border-radius:20px; }
+    .crow { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--brd); gap:10px; }
+    .bmain { width:100%; background:var(--acc); color:#fff; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:12px; }
+    .bsec { width:100%; background:rgba(255,255,255,.08); color:var(--mut); border:none; border-radius:12px; padding:10px; font-size:14px; margin-top:8px; cursor:pointer; }
+    .disc { margin-top:30px; padding-top:16px; border-top:1px solid var(--brd); font-size:12px; color:var(--mut); text-align:center; }
   </style>
 </head>
 <body>
   <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
-
-  <header>
-    <div class="top-bar">
-      <input type="text" id="q" class="search" placeholder="Поиск по наличию..." oninput="draw()" />
-      <button class="cat-btn" id="openCat">Каталог ☰</button>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <div class="head-row">
-      <div class="title" id="catTitle">Все товары</div>
-      <div class="badge-18">18+</div>
-    </div>
-    <div class="grid" id="grid"></div>
-    <div class="disclaimer">18+ • Весь контент (текст, фото, цены) на этой странице публикуется исключительно в ознакомительных целях.</div>
-  </div>
-
-  <div class="drawer" id="catDrawer">
-    <div class="d-in">
-      <div class="d-head"><h3>Каталог</h3><button class="close" id="closeCat">✕</button></div>
-      <div id="catList"></div>
-    </div>
-  </div>
-
-  <div class="drawer" id="cartDrawer">
-    <div class="d-in">
-      <div class="d-head"><h3>Корзина</h3><button class="close" id="closeCart">✕</button></div>
-      <div id="cartList" style="flex:1; overflow-y:auto;"></div>
-      <div style="padding-top:16px; border-top:1px solid var(--border);">
-        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700;">
-          <span>Итого:</span><span id="totalSum">0₽</span>
-        </div>
-        <button class="btn-main" id="sendOrder">Оформить заказ</button>
-        <button class="btn-sec" id="clearCart">Очистить корзину</button>
-      </div>
-    </div>
-  </div>
-
-  <button class="fab" id="fab"><span>🛒 Корзина</span><span class="badge" id="fabCount">0</span></button>
-
+  <header><div class="top"><input type="text" id="q" class="search" placeholder="Поиск по наличию..." oninput="draw()" /><button class="cat-btn" onclick="openD('catD')">Каталог ☰</button></div></header>
+  <div class="wrap"><div class="h-row"><div class="title" id="cTitle">Все товары</div><div class="b18">18+</div></div><div class="grid" id="grid"></div><div class="disc">18+ • Весь контент (текст, фото, цены) на этой странице публикуется исключительно в ознакомительных целях.</div></div>
+  <div class="drw" id="catD"><div class="din"><div class="dhead"><h3>Каталог</h3><button class="cls" onclick="closeD('catD')">✕</button></div><div id="cList"></div></div></div>
+  <div class="drw" id="cartD"><div class="din"><div class="dhead"><h3>Корзина</h3><button class="cls" onclick="closeD('cartD')">✕</button></div><div id="cartL" style="flex:1;overflow-y:auto;"></div><div style="padding-top:16px;border-top:1px solid var(--brd);"><div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;"><span>Итого:</span><span id="tSum">0₽</span></div><button class="bmain" onclick="order()">Оформить заказ</button><button class="bsec" onclick="clr()">Очистить корзину</button></div></div></div>
+  <button class="fab" id="fab" onclick="renderC();openD('cartD')"><span>🛒 Корзина</span><span class="bdg" id="fCnt">0</span></button>
   <script>
-    try {
-      const tg = window.Telegram && window.Telegram.WebApp;
-      if (tg) { tg.ready(); tg.expand(); }
-    } catch (e) {}
-
-    const MANAGER = "ваш_юзернейм_менеджера";
+    const MGR = "ваш_юзернейм_менеджера";
     const cats = ["Все товары", "POD системы (с вкусовыми картриджами)", "Жидкости", "Испарители и картриджи", "POD системы"];
     const items = [
       { id: 1, cat: "Жидкости", name: "Пример: Жидкость 1", price: 450 },
@@ -107,42 +67,49 @@
       { id: 3, cat: "Испарители и картриджи", name: "Пример: Картридж 1", price: 350 },
       { id: 4, cat: "POD системы (с вкусовыми картриджами)", name: "Пример: POD со вкусами 1", price: 1500 }
     ];
-
-    let curCat = "Все товары";
-    let cart = {};
-
-    document.getElementById("openCat").onclick = () => document.getElementById("catDrawer").classList.add("open");
-    document.getElementById("closeCat").onclick = () => document.getElementById("catDrawer").classList.remove("open");
-    document.getElementById("fab").onclick = () => { renderCart(); document.getElementById("cartDrawer").classList.add("open"); };
-    document.getElementById("closeCart").onclick = () => document.getElementById("cartDrawer").classList.remove("open");
-
-    document.getElementById("clearCart").onclick = () => {
-      cart = {}; draw(); updateFab(); document.getElementById("cartDrawer").classList.remove("open");
-    };
-
-    document.getElementById("sendOrder").onclick = () => {
-      const keys = Object.keys(cart);
-      if (!keys.length) return;
-      let sum = 0;
-      let txt = ["🛒 Новый заказ:\n"];
-      keys.forEach((id, i) => {
-        const p = items.find(x => x.id == id);
-        const s = p.price * cart[id];
-        sum += s;
-        txt.push(`${i + 1}. ${p.name} — ${cart[id]} шт. (${s}₽)`);
-      });
-      txt.push(`\n💰 Итого: ${sum}₽`);
-      const url = `https://t.me{MANAGER}?text=${encodeURIComponent(txt.join("\n"))}`;
-      window.open(url, "_blank");
-    };
-
+    let cur = "Все товары", cart = {};
+    function openD(id) { document.getElementById(id).classList.add("open"); }
+    function closeD(id) { document.getElementById(id).classList.remove("open"); }
+    function setC(c) { cur = c; document.getElementById("cTitle").innerText = c; closeD("catD"); draw(); }
+    function clr() { cart = {}; draw(); updF(); closeD("cartD"); }
     function upd(id, d) {
       cart[id] = (cart[id] || 0) + d;
       if (cart[id] <= 0) delete cart[id];
-      draw(); updateFab();
-      if (document.getElementById("cartDrawer").classList.contains("open")) renderCart();
+      draw(); updF();
+      if (document.getElementById("cartD").classList.contains("open")) renderC();
     }
-
-    function updateFab() {
-      const cnt = Object.values(cart).reduce((a, b) => a + b, 0);
-      const fab = document.getElementById("fab");
+    function updF() {
+      const n = Object.values(cart).reduce((a, b) => a + b, 0);
+      document.getElementById("fCnt").innerText = n;
+      document.getElementById("fab").classList.toggle("show", n > 0);
+    }
+    function renderC() {
+      const k = Object.keys(cart), el = document.getElementById("cartL");
+      if (!k.length) { el.innerHTML = '<p style="color:var(--mut);text-align:center;margin-top:40px;">Корзина пуста</p>'; document.getElementById("tSum").innerText = "0₽"; return; }
+      let s = 0;
+      el.innerHTML = k.map(id => {
+        const p = items.find(x => x.id == id), sum = p.price * cart[id]; s += sum;
+        return `<div class="crow"><div><div style="font-size:14px">${p.name}</div><div style="font-size:13px;color:var(--mut)">${p.price}₽ × ${cart[id]} = ${sum}₽</div></div><div class="qbox"><button class="qbtn" onclick="upd(${p.id},-1)">−</button><span>${cart[id]}</span><button class="qbtn" onclick="upd(${p.id},1)">+</button></div></div>`;
+      }).join("");
+      document.getElementById("tSum").innerText = s + "₽";
+    }
+    function order() {
+      const k = Object.keys(cart); if (!k.length) return;
+      let s = 0, t = ["🛒 Новый заказ:\n"];
+      k.forEach((id, i) => { const p = items.find(x => x.id == id), sum = p.price * cart[id]; s += sum; t.push(`${i+1}. ${p.name} — ${cart[id]} шт. (${sum}₽)`); });
+      t.push(`\n💰 Итого: ${s}₽`);
+      window.open(`https://t.me{MGR}?text=${encodeURIComponent(t.join("\n"))}`, "_blank");
+    }
+    function draw() {
+      const q = document.getElementById("q").value.toLowerCase();
+      document.getElementById("grid").innerHTML = items.filter(p => (cur === "Все товары" || p.cat === cur) && p.name.toLowerCase().includes(q)).map(p => {
+        const n = cart[p.id] || 0;
+        const b = n === 0 ? `<button class="add" onclick="upd(${p.id},1)">+</button>` : `<div class="qbox"><button class="qbtn" onclick="upd(${p.id},-1)">−</button><span>${n}</span><button class="qbtn" onclick="upd(${p.id},1)">+</button></div>`;
+        return `<div class="card"><div><div class="ph">Фото появится позже</div><div class="pname">${p.name}</div></div><div class="foot"><span class="price">${p.price}₽</span>${b}</div></div>`;
+      }).join("");
+    }
+    document.getElementById("cList").innerHTML = cats.map(c => `<div class="citem" onclick="setC('${c}')"><span>${c}</span><span>›</span></div>`).join("");
+    draw();
+  </script>
+</body>
+</html>
