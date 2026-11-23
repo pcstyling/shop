@@ -21,7 +21,9 @@
     .search { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
     .cat-btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; }
     .wrap { padding: 16px; }
-    .title { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+    .title { font-size: 20px; font-weight: 700; }
+    .badge-18 { background: rgba(255,107,43,0.15); color: var(--accent); border: 1px solid rgba(255,107,43,0.3); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
     @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
@@ -44,31 +46,12 @@
     .fab.show { display: flex; }
     .badge { background: #fff; color: var(--accent); font-weight: 800; font-size: 12px; padding: 2px 7px; border-radius: 20px; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
-    .btn-main { display: block; width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; text-align: center; user-select: none; }
+    .btn-main { display: block; width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; text-align: center; }
     .btn-sec { width: 100%; background: rgba(255,255,255,0.08); color: var(--muted); border: none; border-radius: 12px; padding: 10px; font-size: 14px; margin-top: 8px; cursor: pointer; }
-    
-    /* Чистый CSS-экран 18+ без зависимости от JS */
-    #ageToggle { display: none; }
-    #ageToggle:checked ~ .age-overlay { display: none !important; }
-    .age-overlay { position: fixed; inset: 0; background: rgba(10,10,12,0.95); backdrop-filter: blur(20px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .age-card { max-width: 380px; width: 100%; background: rgba(30,30,36,0.98); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
-    .age-badge { display: inline-block; background: rgba(255,107,43,0.15); color: var(--accent); font-size: 24px; font-weight: 800; padding: 8px 18px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,107,43,0.3); }
-    .age-text { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+    .disclaimer { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); text-align: center; line-height: 1.4; }
   </style>
 </head>
 <body>
-  <input type="checkbox" id="ageToggle" />
-
-  <!-- Окно 18+ -->
-  <div class="age-overlay">
-    <div class="age-card">
-      <div class="age-badge">18+</div>
-      <h3 style="margin-bottom: 10px;">Подтвердите возраст</h3>
-      <p class="age-text">Весь контент (текст, фото, цены) публикуется исключительно в ознакомительных целях. Продолжая, вы подтверждаете, что вам исполнилось 18 лет.</p>
-      <label for="ageToggle" class="btn-main" style="margin-top:0;">Мне исполнилось 18 лет</label>
-    </div>
-  </div>
-
   <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
   <header>
@@ -79,8 +62,12 @@
   </header>
 
   <div class="wrap">
-    <div class="title" id="catTitle">Все товары</div>
+    <div class="head-row">
+      <div class="title" id="catTitle">Все товары</div>
+      <div class="badge-18">18+</div>
+    </div>
     <div class="grid" id="grid"></div>
+    <div class="disclaimer">18+ • Весь контент (текст, фото, цены) на этой странице публикуется исключительно в ознакомительных целях.</div>
   </div>
 
   <div class="drawer" id="catDrawer">
@@ -138,3 +125,24 @@
       if (!keys.length) return;
       let sum = 0;
       let txt = ["🛒 Новый заказ:\n"];
+      keys.forEach((id, i) => {
+        const p = items.find(x => x.id == id);
+        const s = p.price * cart[id];
+        sum += s;
+        txt.push(`${i + 1}. ${p.name} — ${cart[id]} шт. (${s}₽)`);
+      });
+      txt.push(`\n💰 Итого: ${sum}₽`);
+      const url = `https://t.me{MANAGER}?text=${encodeURIComponent(txt.join("\n"))}`;
+      window.open(url, "_blank");
+    };
+
+    function upd(id, d) {
+      cart[id] = (cart[id] || 0) + d;
+      if (cart[id] <= 0) delete cart[id];
+      draw(); updateFab();
+      if (document.getElementById("cartDrawer").classList.contains("open")) renderCart();
+    }
+
+    function updateFab() {
+      const cnt = Object.values(cart).reduce((a, b) => a + b, 0);
+      const fab = document.getElementById("fab");
