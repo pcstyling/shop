@@ -44,25 +44,32 @@
     .fab.show { display: flex; }
     .badge { background: #fff; color: var(--accent); font-weight: 800; font-size: 12px; padding: 2px 7px; border-radius: 20px; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
-    .btn-main { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
+    .btn-main { display: block; width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; text-align: center; user-select: none; }
     .btn-sec { width: 100%; background: rgba(255,255,255,0.08); color: var(--muted); border: none; border-radius: 12px; padding: 10px; font-size: 14px; margin-top: 8px; cursor: pointer; }
-    .age-overlay { position: fixed; inset: 0; background: rgba(10,10,12,0.92); backdrop-filter: blur(20px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .age-card { max-width: 380px; width: 100%; background: rgba(30,30,36,0.95); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
+    
+    /* Чистый CSS-экран 18+ без зависимости от JS */
+    #ageToggle { display: none; }
+    #ageToggle:checked ~ .age-overlay { display: none !important; }
+    .age-overlay { position: fixed; inset: 0; background: rgba(10,10,12,0.95); backdrop-filter: blur(20px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .age-card { max-width: 380px; width: 100%; background: rgba(30,30,36,0.98); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
     .age-badge { display: inline-block; background: rgba(255,107,43,0.15); color: var(--accent); font-size: 24px; font-weight: 800; padding: 8px 18px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,107,43,0.3); }
     .age-text { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+  <input type="checkbox" id="ageToggle" />
 
-  <div class="age-overlay" id="ageModal">
+  <!-- Окно 18+ -->
+  <div class="age-overlay">
     <div class="age-card">
       <div class="age-badge">18+</div>
       <h3 style="margin-bottom: 10px;">Подтвердите возраст</h3>
       <p class="age-text">Весь контент (текст, фото, цены) публикуется исключительно в ознакомительных целях. Продолжая, вы подтверждаете, что вам исполнилось 18 лет.</p>
-      <button class="btn-main" id="confirmAge" onclick="passAge()" style="margin-top:0;">Мне исполнилось 18 лет</button>
+      <label for="ageToggle" class="btn-main" style="margin-top:0;">Мне исполнилось 18 лет</label>
     </div>
   </div>
+
+  <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
   <header>
     <div class="top-bar">
@@ -100,18 +107,9 @@
   <button class="fab" id="fab"><span>🛒 Корзина</span><span class="badge" id="fabCount">0</span></button>
 
   <script>
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
-
-    function passAge() {
-      document.getElementById("ageModal").style.display = "none";
-      try { localStorage.setItem("age_verified", "true"); } catch (e) {}
-    }
-
     try {
-      if (localStorage.getItem("age_verified") === "true") {
-        document.getElementById("ageModal").style.display = "none";
-      }
+      const tg = window.Telegram && window.Telegram.WebApp;
+      if (tg) { tg.ready(); tg.expand(); }
     } catch (e) {}
 
     const MANAGER = "ваш_юзернейм_менеджера";
@@ -139,3 +137,4 @@
       const keys = Object.keys(cart);
       if (!keys.length) return;
       let sum = 0;
+      let txt = ["🛒 Новый заказ:\n"];
