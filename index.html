@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vape Shop</title>
+  <script src="https://telegram.org"></script>
+  <style>
+    :root {
+      --bg-color: #121214;
+      --card-bg: rgba(30, 30, 35, 0.85);
+      --accent: #ff6b2b;
+      --text-main: #ffffff;
+      --text-muted: #9ca3af;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 50%, #1a1a22 0%, #0d0d10 100%);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.45;
+      animation: float 14s infinite ease-in-out alternate;
+    }
+
+    .orb-1 {
+      width: 260px;
+      height: 260px;
+      background: #ff6b2b;
+      top: -40px;
+      left: -60px;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: #6c2bd9;
+      bottom: -60px;
+      right: -60px;
+      animation-delay: -5s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: #0ea5e9;
+      top: 40%;
+      left: 30%;
+      animation-delay: -9s;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(35px, 50px) scale(1.15); }
+      100% { transform: translate(-25px, 20px) scale(0.95); }
+    }
+
+    header {
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      background: rgba(18, 18, 20, 0.75);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .catalog-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .catalog-drawer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 15, 18, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 50;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .catalog-drawer.active {
+      display: block;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .category-item {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .category-item:hover {
+      color: var(--accent);
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .img-placeholder {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08));
+      border: 1px dashed rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .product-title {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .add-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="animated-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header>
+    <div class="top-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Я ищу..." oninput="renderProducts()" />
+      <button class="catalog-btn" onclick="toggleCatalog()">Каталог ☰</button>
+    </div>
+  </header>
+
+  <div class="catalog-drawer" id="catalogDrawer">
+    <div class="drawer-header">
+      <h3>Каталог</h3>
+      <button class="close-btn" onclick="toggleCatalog()">✕</button>
+    </div>
+    <div id="categoryList"></div>
+  </div>
+
+  <main class="container">
+    <div class="section-title" id="currentCategoryTitle">Все товары</div>
+    <div class="grid" id="productsGrid"></div>
+  </main>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const categories = [
+      "Все товары",
+      "POD системы (с вкусовыми картриджами)",
+      "Жидкости",
+      "Испарители и картриджи",
+      "POD системы"
+    ];
+
+    const products = [
+      { id: 1, category: "Жидкости", name: "Пример: Жидкость 1", price: 450 },
+      { id: 2, category: "POD системы", name: "Пример: POD система 1", price: 2100 },
+      { id: 3, category: "Испарители и картриджи", name: "Пример: Картридж 1", price: 350 },
+      { id: 4, category: "POD системы (с вкусовыми картриджами)", name: "Пример: POD со вкусами 1", price: 1500 }
+    ];
+
+    let selectedCategory = "Все товары";
+
+    function toggleCatalog() {
+      document.getElementById("catalogDrawer").classList.toggle("active");
+    }
+
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      document.getElementById("currentCategoryTitle").innerText = cat;
+      toggleCatalog();
+      renderProducts();
+    }
+
+    function renderCategories() {
+      const list = document.getElementById("categoryList");
+      list.innerHTML = categories.map(cat => `
+        <div class="category-item" onclick="selectCategory('${cat}')">
+          <span>${cat}</span>
+          <span>›</span>
+        </div>
+      `).join("");
+    }
+
+    function renderProducts() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const grid = document.getElementById("productsGrid");
+
+      const filtered = products.filter(p => {
+        const matchCat = selectedCategory === "Все товары" || p.category === selectedCategory;
+        const matchQuery = p.name.toLowerCase().includes(query);
+        return matchCat && matchQuery;
+      });
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="card">
+          <div>
+            <div class="img-placeholder">Фото появится позже</div>
+            <div class="product-title">${p.name}</div>
+          </div>
+          <div class="card-footer">
+            <span class="price">${p.price}₽</span>
+            <button class="add-btn" onclick="alert('Добавлено: ${p.name}')">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    renderCategories();
+    renderProducts();
+  </script>
+</body>
+</html>
