@@ -302,29 +302,42 @@
       font-weight: 600;
     }
 
-    .cart-bar {
+    /* Плавающая кнопка корзины в правом нижнем углу */
+    .cart-fab {
       display: none;
       position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 500px;
+      bottom: 20px;
+      right: 20px;
       background: var(--accent);
       color: #fff;
-      padding: 14px 18px;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 15px;
-      justify-content: space-between;
+      border: none;
+      padding: 13px 18px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 14px;
       align-items: center;
-      box-shadow: 0 8px 24px rgba(255, 107, 43, 0.4);
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(255, 107, 43, 0.45);
       cursor: pointer;
       z-index: 30;
+      transition: transform 0.15s ease;
     }
 
-    .cart-bar.visible {
+    .cart-fab:active {
+      transform: scale(0.95);
+    }
+
+    .cart-fab.visible {
       display: flex;
+    }
+
+    .cart-badge {
+      background: #fff;
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 12px;
+      padding: 2px 7px;
+      border-radius: 20px;
     }
 
     .cart-items {
@@ -403,7 +416,7 @@
 
   <header>
     <div class="top-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Я ищу..." oninput="renderProducts()" />
+      <input type="text" id="searchInput" class="search-input" placeholder="Поиск по наличию..." oninput="renderProducts()" />
       <button class="catalog-btn" onclick="toggleCatalog()">Каталог ☰</button>
     </div>
   </header>
@@ -443,15 +456,3 @@
         <button class="clear-btn" onclick="clearCart()">Очистить корзину</button>
       </div>
     </div>
-  </div>
-
-  <!-- Нижняя кнопка корзины -->
-  <div class="cart-bar" id="cartBar" onclick="toggleCart()">
-    <span id="cartBarCount">Корзина • 0 шт.</span>
-    <span id="cartBarSum">0₽ ›</span>
-  </div>
-
-  <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
