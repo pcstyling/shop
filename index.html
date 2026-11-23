@@ -28,6 +28,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      padding-bottom: 85px;
     }
 
     .animated-bg {
@@ -122,7 +123,7 @@
       gap: 6px;
     }
 
-    .catalog-drawer {
+    .drawer {
       display: none;
       position: fixed;
       inset: 0;
@@ -133,8 +134,9 @@
       overflow-y: auto;
     }
 
-    .catalog-drawer.active {
-      display: block;
+    .drawer.active {
+      display: flex;
+      flex-direction: column;
     }
 
     .drawer-header {
@@ -240,6 +242,120 @@
       font-size: 18px;
       cursor: pointer;
     }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 4px 8px;
+    }
+
+    .qty-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 20px;
+    }
+
+    .qty-val {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Нижняя плашка корзины */
+    .cart-bar {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 15px;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(255, 107, 43, 0.4);
+      cursor: pointer;
+      z-index: 30;
+    }
+
+    .cart-bar.visible {
+      display: flex;
+    }
+
+    /* Элементы внутри окна корзины */
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-title {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .cart-footer {
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .clear-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 14px;
+      margin-top: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -257,7 +373,8 @@
     </div>
   </header>
 
-  <div class="catalog-drawer" id="catalogDrawer">
+  <!-- Выдвижной каталог -->
+  <div class="drawer" id="catalogDrawer">
     <div class="drawer-header">
       <h3>Каталог</h3>
       <button class="close-btn" onclick="toggleCatalog()">✕</button>
@@ -265,10 +382,34 @@
     <div id="categoryList"></div>
   </div>
 
+  <!-- Выдвижная корзина -->
+  <div class="drawer" id="cartDrawer">
+    <div class="drawer-header">
+      <h3>Корзина</h3>
+      <button class="close-btn" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItemsList"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Итого:</span>
+        <span id="cartTotalSum">0₽</span>
+      </div>
+      <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+      <button class="clear-btn" onclick="clearCart()">Очистить корзину</button>
+    </div>
+  </div>
+
+  <!-- Основной экран -->
   <main class="container">
     <div class="section-title" id="currentCategoryTitle">Все товары</div>
     <div class="grid" id="productsGrid"></div>
   </main>
+
+  <!-- Нижняя кнопка корзины -->
+  <div class="cart-bar" id="cartBar" onclick="toggleCart()">
+    <span id="cartBarCount">Корзина • 0 шт.</span>
+    <span id="cartBarSum">0₽ ›</span>
+  </div>
 
   <script>
     const tg = window.Telegram?.WebApp;
@@ -276,6 +417,9 @@
       tg.ready();
       tg.expand();
     }
+
+    // ВПИШИ СЮДА ЮЗЕРНЕЙМ МЕНЕДЖЕРА БЕЗ @ (например: "ivan_manager")
+    const MANAGER_USERNAME = "ваш_юзернейм_менеджера";
 
     const categories = [
       "Все товары",
@@ -293,54 +437,6 @@
     ];
 
     let selectedCategory = "Все товары";
+    let cart = {}; // { id: количество }
 
     function toggleCatalog() {
-      document.getElementById("catalogDrawer").classList.toggle("active");
-    }
-
-    function selectCategory(cat) {
-      selectedCategory = cat;
-      document.getElementById("currentCategoryTitle").innerText = cat;
-      toggleCatalog();
-      renderProducts();
-    }
-
-    function renderCategories() {
-      const list = document.getElementById("categoryList");
-      list.innerHTML = categories.map(cat => `
-        <div class="category-item" onclick="selectCategory('${cat}')">
-          <span>${cat}</span>
-          <span>›</span>
-        </div>
-      `).join("");
-    }
-
-    function renderProducts() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const grid = document.getElementById("productsGrid");
-
-      const filtered = products.filter(p => {
-        const matchCat = selectedCategory === "Все товары" || p.category === selectedCategory;
-        const matchQuery = p.name.toLowerCase().includes(query);
-        return matchCat && matchQuery;
-      });
-
-      grid.innerHTML = filtered.map(p => `
-        <div class="card">
-          <div>
-            <div class="img-placeholder">Фото появится позже</div>
-            <div class="product-title">${p.name}</div>
-          </div>
-          <div class="card-footer">
-            <span class="price">${p.price}₽</span>
-            <button class="add-btn" onclick="alert('Добавлено: ${p.name}')">+</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    renderCategories();
-    renderProducts();
-  </script>
-</body>
-</html>
